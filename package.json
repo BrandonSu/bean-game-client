@@ -1,25 +1,20 @@
 {
-  "name": "phaser3-project-template",
+  "name": "bean-game-client",
   "version": "1.1.0",
   "description": "A Phaser 3 Project Template",
   "main": "src/index.js",
   "scripts": {
-    "dev-server": "webpack-dev-server --open",
-    "start": "node server.js",
-    "build": "webpack -p",
+    "dev-server": "webpack-dev-server --config webpack/base.js --open",
+    "start": "nodemon server.js",
+    "build": "webpack --config webpack/prod.js",
     "heroku-postbuild": "npm run build"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/photonstorm/phaser3-project-template.git"
+    "url": "git+https://github.com/olinastath/bean-game-client.git"
   },
-  "author": "Richard Davey <rdavey@gmail.com> (http://www.photonstorm.com)",
   "license": "MIT",
   "licenseUrl": "http://www.opensource.org/licenses/mit-license.php",
-  "bugs": {
-    "url": "https://github.com/photonstorm/phaser3-project-template/issues"
-  },
-  "homepage": "https://github.com/photonstorm/phaser3-project-template#readme",
   "dependencies": {
     "@babel/core": "^7.7.2",
     "@babel/preset-env": "^7.7.1",
@@ -28,6 +23,7 @@
     "express": "^4.17.1",
     "file-loader": "^4.2.0",
     "html-webpack-plugin": "^3.2.0",
+    "nodemon": "^2.0.3",
     "phaser": "^3.20.1",
     "raw-loader": "^3.1.0",
     "socket.io-client": "^2.3.0",
