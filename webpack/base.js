@@ -32,9 +32,6 @@ module.exports = {
     new webpack.DefinePlugin({
       CANVAS_RENDERER: JSON.stringify(true),
       WEBGL_RENDERER: JSON.stringify(true)
-    }),
-    new HtmlWebpackPlugin({
-      template: "./index.html"
     })
   ]
 };
