@@ -200,6 +200,9 @@ export default class Turn {
                 self.dropToTradeFromDeck(gameObject, dropZone.name);
             } else if (scene.phase === 3 && dropZone.name === scene.playerTurn.id) {
                 self.dropToTradeFromHand(gameObject, dropZone.name);
+            } else {
+                gameObject.x = gameObject.input.dragStartX;
+                gameObject.y = gameObject.input.dragStartY;
             }
         });
 
