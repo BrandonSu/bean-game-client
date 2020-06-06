@@ -12,7 +12,7 @@ export default class Harvest {
             if (harvestNumbers) {
                 self.createDOMElements();
                 if (harvestNumbers[field.cardCount]) {
-                    self.updatePopupText(config.CONSTANTS.FLAGS.HARVEST_FLAG, field, harvestNumbers[field.cardCount]);
+                    self.updatePopupText(config.CONSTANTS.FLAGS.HARVEST_FLAG, field, harvestNumbers[field.cardCount], field.cardCount);
                     self.setYesButtonEventListener(() => self.discardCardsFromField(field, field.cardCount, harvestNumbers[field.cardCount], fieldIndex, true));
                 } else {
                     if (field.cardCount < Object.keys(harvestNumbers)[0]) {
@@ -26,7 +26,7 @@ export default class Harvest {
                             }
                             maxHarvest = num;
                         }
-                        self.updatePopupText(config.CONSTANTS.FLAGS.HARVEST_FLAG, field, harvestNumbers[maxHarvest]);
+                        self.updatePopupText(config.CONSTANTS.FLAGS.HARVEST_FLAG, field, harvestNumbers[maxHarvest], maxHarvest);
                         self.setYesButtonEventListener(() => self.discardCardsFromField(field, maxHarvest, harvestNumbers[maxHarvest], fieldIndex, false));
                     }
                 }
@@ -34,6 +34,8 @@ export default class Harvest {
                 window.alert('Field is empty.');
                 utils.resetHarvestFieldButtonDisplay(scene);
             }
+
+            console.log('phase', scene.phase);
         }
 
         /**
@@ -105,12 +107,12 @@ export default class Harvest {
          * @param {Object} field field considering discarding
          * @param {number} coins number of coins to be received after discarding field
          */
-        this.updatePopupText = function(discardHarvestFlag, field, coins = 0) {
+        this.updatePopupText = function(discardHarvestFlag, field, coins = 0, cardsDiscarded) {
             let harvestText = scene.harvestPopup.getChildByID('harvestText');
             let discardText = scene.harvestPopup.getChildByID('discardText')
             if (discardHarvestFlag === config.CONSTANTS.FLAGS.HARVEST_FLAG) {
                 discardText.style.display = 'none';
-                harvestText.innerText = harvestText.innerText.replace('NUM_BEANS', field.cardCount).replace('BEAN_TYPE', self.getBeanName(field)).replace('NUM_COINS', coins);
+                harvestText.innerText = harvestText.innerText.replace('NUM_BEANS', cardsDiscarded).replace('BEAN_TYPE', self.getBeanName(field)).replace('NUM_COINS', coins);
             } else if (discardHarvestFlag == config.CONSTANTS.FLAGS.DISCARD_FLAG) {
                 harvestText.style.display = 'none';
                 discardText.innerText = discardText.innerText.replace('NUM_BEANS', field.cardCount).replace('BEAN_TYPE', self.getBeanName(field));
