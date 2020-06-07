@@ -85,7 +85,7 @@ export default class Game extends Phaser.Scene {
         this.startText = this.add.text(self.width / 2, self.height / 2 + 25, ['START GAME']).setOrigin(0.5).setFontSize(25).setFontFamily('Bodoni Highlight').setColor('#fad550').setInteractive().setVisible(false);
 
         // SOCKET STUFF
-        this.socket = io(devEnv ? 'http://localhost:2000/' : 'https://bean-game-server.herokuapp.com/');
+        this.socket = io('http://ddb068e144f9.ngrok.io');
         this.socket.on('connect', function() {
             console.log('Connected: ' + self.socket.id);
             self.player.id = self.socket.id;
