@@ -3,8 +3,8 @@ import Game from "./scenes/game";
 
 const config = {
   type: Phaser.AUTO,
-  width: window.innerWidth,
-  height: window.innerHeight,
+  width: 1300,
+  height: 650,
   scene: [
     Game
   ],

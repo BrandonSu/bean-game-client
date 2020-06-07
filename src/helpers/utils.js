@@ -61,6 +61,32 @@ function getAvailableField(fields, cardPlanted) {
 }
 
 /**
+ * @method getPlacementVariables
+ * @description Returns variables needed for placement of other players' fields, based on number of players connected
+ * @param numOfPlayers {int} numbr of players connected
+ * @returns {Object} variables based on number of players
+ */
+function getPlacementVariables(numOfPlayers) {
+    let maxPlayers = numOfPlayers === 7;
+    return {
+        scale: maxPlayers ? 0.15 : 0.20,
+        cardOffset: {
+            x: maxPlayers ? 50 : 25,
+            y: maxPlayers ? 50 : 30
+        },
+        counterOffset: {
+            x: maxPlayers ? 0 : 10,
+            y: maxPlayers ? 120 : 150 
+        },
+        nameOffset: {
+            x: 120,
+            y: maxPlayers ? 30 : 10
+        },
+        distanceBetweenFields: maxPlayers ? 180 : 220
+    }
+}
+
+/**
  * @module utils
  * @description Module for util functions
  */
@@ -69,5 +95,6 @@ export default {
     resetHarvestFieldButtonDisplay,
     getPlayersExcept,
     isFieldEmpty,
-    getAvailableField
+    getAvailableField,
+    getPlacementVariables
 };

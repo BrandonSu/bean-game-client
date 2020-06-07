@@ -28,10 +28,15 @@ export default class Game extends Phaser.Scene {
 
         this.load.image('field', 'src/assets/images/field.png');
         this.load.image('coin', 'src/assets/images/coin.png');
+        this.load.image('coinStack1', 'src/assets/images/coin-stack-1.png');
+        this.load.image('coinStack2', 'src/assets/images/coin-stack-2.png');
+        this.load.image('coinStack3', 'src/assets/images/coin-stack-3.png');
+        this.load.image('coinStack4', 'src/assets/images/coin-stack-4.png');
         this.load.image('cardBack', 'src/assets/images/card-back.png');
         this.load.image('drawnFirst', 'src/assets/images/1st-drawn.png');
         this.load.image('drawnSecond', 'src/assets/images/2nd-drawn.png');
         this.load.image('discardPile', 'src/assets/images/discard-pile.png');
+        this.load.image('startHere', 'src/assets/images/start-here.png');
         this.load.image('deck', 'src/assets/images/deck.png');
         this.load.image('table', 'src/assets/images/table.jpg');
 
@@ -48,6 +53,8 @@ export default class Game extends Phaser.Scene {
         for (let i = 1; i < 8; i++) {
             this['isPlayer' + i] = false;
         }
+        this.height = 650;
+        this.width = 1300;
         
         this.zone = new Zone(this);
         this.dealer = new Dealer(this);
@@ -59,10 +66,10 @@ export default class Game extends Phaser.Scene {
             id: '',
             coins: 0,
             hand: [],
-            fieldZone: this.zone.renderZone(170, window.innerHeight / 2, 330, 240, 'fieldZone'),
+            fieldZone: self.zone.renderZone(170, self.height / 2, 330, 240, 'fieldZone'),
             fields: [
-                {fieldType: config.CONSTANTS.EMPTY_FIELD, cardCount: 0, x: 50, y: window.innerHeight / 2, counterText: null, cards: []},
-                {fieldType: config.CONSTANTS.EMPTY_FIELD, cardCount: 0, x: 175, y: window.innerHeight / 2, counterText: null, cards: []}
+                {fieldType: config.CONSTANTS.EMPTY_FIELD, cardCount: 0, x: 50, y: self.height / 2, counterText: null, cards: []},
+                {fieldType: config.CONSTANTS.EMPTY_FIELD, cardCount: 0, x: 175, y: self.height / 2, counterText: null, cards: []}
             ],
             order: 0
         }
@@ -74,8 +81,8 @@ export default class Game extends Phaser.Scene {
         this.playerTurn;
         this.phase = 0;
 
-        this.playerCountText = this.add.text(window.innerWidth / 2, window.innerHeight / 2 - 25, [this.numberOfPlayers + ' players ready']).setOrigin(0.5).setFontSize(25).setFontFamily('Bodoni Highlight').setColor('#fad550').setInteractive().setVisible(false);
-        this.startText = this.add.text(window.innerWidth / 2, window.innerHeight / 2 + 25, ['START GAME']).setOrigin(0.5).setFontSize(25).setFontFamily('Bodoni Highlight').setColor('#fad550').setInteractive().setVisible(false);
+        this.playerCountText = this.add.text(self.width / 2, self.height / 2 - 25, [self.numberOfPlayers + ' players ready']).setOrigin(0.5).setFontSize(25).setFontFamily('Bodoni Highlight').setColor('#fad550').setInteractive().setVisible(false);
+        this.startText = this.add.text(self.width / 2, self.height / 2 + 25, ['START GAME']).setOrigin(0.5).setFontSize(25).setFontFamily('Bodoni Highlight').setColor('#fad550').setInteractive().setVisible(false);
 
         // SOCKET STUFF
         this.socket = io(devEnv ? 'http://localhost:2000/' : 'https://bean-game-server.herokuapp.com/');
@@ -85,7 +92,7 @@ export default class Game extends Phaser.Scene {
         });
 
         // LANDING PAGE
-        let nameForm = this.add.dom(window.innerWidth / 2, window.innerHeight / 2 - 25).createFromCache('nameform');
+        let nameForm = this.add.dom(self.width / 2, self.height / 2 - 25).createFromCache('nameform');
         document.getElementById('goButton').addEventListener('click', function() {
             let name = document.getElementById('nameField').value;
             if (name.length > 0) {
@@ -165,16 +172,30 @@ export default class Game extends Phaser.Scene {
             }
         });
 
+        this.socket.on('updateCoinStack', function(playerId, asset) {
+            let player = self.otherPlayers[playerId];
+            if (player.coinStack.image) {
+                player.coinStack.image.destroy();
+            }
+            
+            player.coinStack.image = self.add.image(player.coinStack.x, player.coinStack.y, asset).setOrigin(1, 0.5).setScale(0.05);
+        });
+
         this.socket.on('cardPlayed', function(gameObject, player) {
             let cardPlayed = gameObject.textureKey;
             if (player.id !== self.player.id) {
                 let field = utils.getAvailableField(self.otherPlayers[player.id].fields, cardPlayed);
                 if (field) {
                     field.cardCount++;
-                    field.counterText.setText(field.cardCount);
+                    if (field.counterText) {
+                        field.counterText.setText(field.cardCount);
+                    } else {
+                        console.log('field.counterText doesn\'t exist');
+                        console.log(field);
+                    }
                     if (utils.isFieldEmpty(field)) {
                         field.fieldType = cardPlayed;
-                        field.cards.push(self.add.image(field.x, field.y, cardPlayed).setOrigin(0, 0).setScale(0.15));
+                        field.cards.push(self.add.image(field.x, field.y, cardPlayed).setOrigin(0, 0).setScale(self.placementConfig.scale));
                     }
                 }
             }
@@ -185,7 +206,7 @@ export default class Game extends Phaser.Scene {
             // adding to discardPile list so we can destroy images when we shuffle
             if (player.id !== self.player.id) {
                 if (addToDiscardPile) {
-                    self.discardPile.list.push(self.add.image(window.innerWidth / 2 + 200, window.innerHeight / 2, cardDiscarded).setOrigin(0, 0.5).setScale(0.25));
+                    self.discardPile.list.push(self.add.image(self.width / 2 + 200, self.height / 2, cardDiscarded).setOrigin(0, 0.5).setScale(0.25));
                 }
                 
                 if (entryPoint === config.CONSTANTS.ENTRY_POINTS.FIELD) {
@@ -195,7 +216,12 @@ export default class Game extends Phaser.Scene {
                     let field = self.otherPlayers[player.id].fields[fieldIndex];
                     if (field) {
                         field.cardCount--;
-                        field.counterText.setText(field.cardCount);
+                        if (field.counterText) {
+                            field.counterText.setText(field.cardCount);
+                        } else {
+                            console.log('field.counterText doesn\'t exist');
+                            console.log(field);
+                        }
 
                         if (emptyField) {
                             let cardDeleted = field.cards.splice(0, 1)[0];

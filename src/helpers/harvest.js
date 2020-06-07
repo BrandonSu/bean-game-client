@@ -45,7 +45,7 @@ export default class Harvest {
          */
         this.createDOMElements = function() {
             if (scene.harvestPopup) scene.harvestPopup.destroy();
-            scene.harvestPopup = scene.add.dom(window.innerWidth / 2, window.innerHeight / 2).setOrigin(0.5).createFromCache('harvestPopup');
+            scene.harvestPopup = scene.add.dom(scene.width / 2, scene.height / 2).setOrigin(0.5).createFromCache('harvestPopup');
             scene.harvestPopup.getChildByID('noButton').addEventListener('click', function() {
                 scene.harvestPopup.destroy();
                 utils.resetHarvestFieldButtonDisplay(scene);
@@ -75,28 +75,20 @@ export default class Harvest {
          */
         this.discardCardsFromField = function(field, cardsDiscarding, coins, fieldIndex, emptyField) {
             // use this method for both emptying field and just harvesting some of the cards
-            // need param to keep track of how many cards we are harvesting and how many are going into the discard pile for later
-            // something like (cardsDiscarding - coins) would be what's going in the pile
-            // then update counterText = counterText - coins, cardCount = cardCount - cardsDiscarding
-            // check if cardCount ends up being 0, then update the fieldType
-            // only discard cardsDiscarding num of cards in field instead of all of them
-            // empty field
-            // add cards to discard pile
             for (let i = 0; i < cardsDiscarding; i++) {
                 scene.turn.discardCard(field.cards[0], config.CONSTANTS.ENTRY_POINTS.FIELD, i < cardsDiscarding - coins, fieldIndex, emptyField);
                 field.cards.splice(0, 1);
                 field.cardCount--;
             }
-            // field.cards.splice(0, cardsDiscarding);
+            
             scene.player.coins += coins;
+            scene.socket.emit('updateCoinStack', scene.player);
+            
             scene.coinCount.setText(scene.player.coins);
             field.counterText.setText(field.cardCount);
             if (emptyField) {
                 field.fieldType = config.CONSTANTS.EMPTY_FIELD;
             }
-            // if coins, add coins to coincounter
-            // scene.coinCount.setText(scene.coinCount.getText() + coins);
-            // last resort, add new image over field?
         }
 
         /**
