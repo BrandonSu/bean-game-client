@@ -48,7 +48,7 @@ export default class Game extends Phaser.Scene {
 
     create() {
         let self = this;
-        let devEnv = window.location.hostname === 'localhost';
+        let devEnv = process.env.DEV_ENV || window.location.hostname === 'localhost';
         this.add.image(0, 0, 'table').disableInteractive();
         for (let i = 1; i < 8; i++) {
             this['isPlayer' + i] = false;
@@ -85,7 +85,7 @@ export default class Game extends Phaser.Scene {
         this.startText = this.add.text(self.width / 2, self.height / 2 + 25, ['START GAME']).setOrigin(0.5).setFontSize(25).setFontFamily('Bodoni Highlight').setColor('#fad550').setInteractive().setVisible(false);
 
         // SOCKET STUFF
-        this.socket = io('https://ddb068e144f9.ngrok.io');
+        this.socket = io(devEnv ? 'http://localhost:2000/': process.env.SERVER);
         this.socket.on('connect', function() {
             console.log('Connected: ' + self.socket.id);
             self.player.id = self.socket.id;
