@@ -101,26 +101,15 @@ export default class Harvest {
          */
         this.updatePopupText = function(discardHarvestFlag, field, coins = 0, cardsDiscarded) {
             let harvestText = scene.harvestPopup.getChildByID('harvestText');
-            let discardText = scene.harvestPopup.getChildByID('discardText')
+            let discardText = scene.harvestPopup.getChildByID('discardText');
             if (discardHarvestFlag === config.CONSTANTS.FLAGS.HARVEST_FLAG) {
                 discardText.style.display = 'none';
-                harvestText.innerText = harvestText.innerText.replace('NUM_BEANS', cardsDiscarded).replace('BEAN_TYPE', self.getBeanName(field)).replace('NUM_COINS', coins);
+                harvestText.innerText = harvestText.innerText.replace('NUM_BEANS', cardsDiscarded).replace('BEAN_TYPE', utils.getBeanNameFromField(field)).replace('NUM_COINS', coins);
             } else if (discardHarvestFlag == config.CONSTANTS.FLAGS.DISCARD_FLAG) {
                 harvestText.style.display = 'none';
-                discardText.innerText = discardText.innerText.replace('NUM_BEANS', field.cardCount).replace('BEAN_TYPE', self.getBeanName(field));
+                discardText.innerText = discardText.innerText.replace('NUM_BEANS', field.cardCount).replace('BEAN_TYPE', utils.getBeanNameFromField(field));
             }
             
-        }
-
-        /**
-         * @function getBeanName
-         * @description Helper function to return parsed bean name by beanType
-         * @memberof harvest
-         * @param {Object} field Field whose bean type we need to parse
-         */
-        this.getBeanName = function(field) {
-            if (field.cardCount > 1) return config.CONSTANTS.BEAN_NAME_MAP[field.fieldType] + 's';
-            else return config.CONSTANTS.BEAN_NAME_MAP[field.fieldType];
         }
     }
 }
