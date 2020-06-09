@@ -87,6 +87,49 @@ function getPlacementVariables(numOfPlayers) {
 }
 
 /**
+ * @method hideDOMElements
+ * @description Hides DOM elements specified
+ * @param elementsArray {Array} DOM elements to hide
+ */
+function hideDOMElements(elementsArray) {
+    elementsArray.forEach( el => el.style.display = 'none');
+}
+
+/**
+ * @method hideDOMElementsByIds
+ * @description Hides DOM elements with specified IDs
+ * @param parentNode {DOMElement} parent element whose children we want to hide
+ * @param elementIdsArray {Array} IDs of elements to hide 
+ */
+function hideDOMElementsByIds(parentNode, elementIdsArray) {
+    let elementsArray = [];
+    elementIdsArray.forEach( id => {
+        elementsArray.push(parentNode.getChildByID(id));
+    });
+    hideDOMElements(elementsArray);
+}
+
+/**
+ * @function getBeanNameFromField
+ * @description Helper function to return parsed bean name from field
+ * @param {Object} field Field whose bean type we need to parse
+ */
+function getBeanNameFromField(field) {
+    let name = getBeanNameFromBeanType(field.fieldType);
+    if (field.cardCount > 1) name += 's';
+    return name;
+}
+
+/**
+ * @function getBeanNameFromBeanType
+ * @description Helper function to return parsed bean name by beanType
+ * @param {string} beanType Bean type we want to parse
+ */
+function getBeanNameFromBeanType(beanType) {
+    return config.CONSTANTS.BEAN_NAME_MAP[beanType];
+}
+
+/**
  * @module utils
  * @description Module for util functions
  */
@@ -96,5 +139,9 @@ export default {
     getPlayersExcept,
     isFieldEmpty,
     getAvailableField,
-    getPlacementVariables
+    getPlacementVariables,
+    hideDOMElements,
+    hideDOMElementsByIds,
+    getBeanNameFromField,
+    getBeanNameFromBeanType
 };
