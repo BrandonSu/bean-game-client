@@ -43,6 +43,7 @@ export default class Game extends Phaser.Scene {
         this.load.html('nameform', 'src/assets/html/name-form.html');
         this.load.html('dashboard', 'src/assets/html/dashboard.html');
         this.load.html('harvestPopup', 'src/assets/html/harvest-popup.html');
+        this.load.html('tradePopup', 'src/assets/html/trade-popup.html');
 
     }
 
@@ -84,6 +85,7 @@ export default class Game extends Phaser.Scene {
         this.startText = this.add.text(self.width / 2, self.height / 2 + 25, ['START GAME']).setOrigin(0.5).setFontSize(25).setFontFamily('Bodoni Highlight').setColor('#fad550').setInteractive().setVisible(false);
 
         // SOCKET STUFF
+        // env vars don't get passed in from server.js
         console.log(process.env.SERVER);
         this.socket = io(process.env.SERVER || 'http://localhost:2000/');
         this.socket.on('connect', function() {
@@ -187,12 +189,7 @@ export default class Game extends Phaser.Scene {
                 let field = utils.getAvailableField(self.otherPlayers[player.id].fields, cardPlayed);
                 if (field) {
                     field.cardCount++;
-                    if (field.counterText) {
-                        field.counterText.setText(field.cardCount);
-                    } else {
-                        console.log('field.counterText doesn\'t exist');
-                        console.log(field);
-                    }
+                    field.counterText.setText(field.cardCount);
                     if (utils.isFieldEmpty(field)) {
                         field.fieldType = cardPlayed;
                         field.cards.push(self.add.image(field.x, field.y, cardPlayed).setOrigin(0, 0).setScale(self.placementConfig.scale));
@@ -216,12 +213,7 @@ export default class Game extends Phaser.Scene {
                     let field = self.otherPlayers[player.id].fields[fieldIndex];
                     if (field) {
                         field.cardCount--;
-                        if (field.counterText) {
-                            field.counterText.setText(field.cardCount);
-                        } else {
-                            console.log('field.counterText doesn\'t exist');
-                            console.log(field);
-                        }
+                        field.counterText.setText(field.cardCount);
 
                         if (emptyField) {
                             let cardDeleted = field.cards.splice(0, 1)[0];
@@ -238,6 +230,16 @@ export default class Game extends Phaser.Scene {
 
         this.socket.on('cardTraded', function(gameObject) {
             self.turn.dropOnField(gameObject, true);
+        });
+
+        this.socket.on('requestTrade', function(gameObject, fromPlayer, fromDeck, fromHand, index) {
+            console.log('requestTrade');
+            self.turn.requestTrade(gameObject, fromPlayer, fromDeck, fromHand, index);
+        });
+
+        this.socket.on('tradeRejected', function(playerRejectingTrade, gameObject, fromDeck, fromHand, index) {
+            console.log('tradeRejected');
+            self.turn.handleRejectedTrade(playerRejectingTrade, gameObject, fromDeck, fromHand, index)
         });
 
         this.socket.on('enableTradingWithPlayer', function(player) {

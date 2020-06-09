@@ -1,3 +1,4 @@
+import Card from './card';
 import config from "./config";
 import utils from "./utils";
 
@@ -30,9 +31,63 @@ export default class Turn {
             let index = scene.openCards.findIndex( card => (card === gameObject));
             if (index !== -1) {
                 scene.openCards.splice(index, 1);
-                // do i need to destroy card?
                 scene.socket.emit('updateOpenCards', scene.openCards);
             }
+            return index;
+        }
+
+        this.requestTrade = function(gameObject, fromPlayer, fromDeck, fromHand, index) {
+            if (scene.tradePopup) scene.tradePopup.destroy();
+            scene.tradePopup = scene.add.dom(scene.width / 2, scene.height / 2).setOrigin(0.5).createFromCache('tradePopup');
+
+            let tradeRequestText = scene.tradePopup.getChildByID('tradeRequestText');
+            tradeRequestText.innerText = tradeRequestText.innerText.replace('PLAYER_NAME', scene.otherPlayers[fromPlayer].name).replace('BEAN_TYPE', utils.getBeanNameFromBeanType(gameObject.textureKey));
+
+            utils.hideDOMElementsByIds(scene.tradePopup, ['tradeRejectedText', 'okButton']);
+
+            scene.tradePopup.getChildByID('yesButton').addEventListener('click', function() {
+                scene.tradePopup.destroy();
+                scene.socket.emit('acceptTrade', scene.player.id, gameObject);
+            });
+
+            scene.tradePopup.getChildByID('noButton').addEventListener('click', function() {
+                scene.tradePopup.destroy();
+                scene.socket.emit('rejectTrade', scene.player.id, fromPlayer, gameObject, fromDeck, fromHand, index);
+            });
+        }
+
+        this.handleRejectedTrade = function(playerRejectingTrade, gameObject, fromDeck, fromHand, index) {
+            if (scene.tradePopup) scene.tradePopup.destroy();
+            scene.tradePopup = scene.add.dom(scene.width / 2, scene.height / 2).setOrigin(0.5).createFromCache('tradePopup');
+
+            let tradeRejectedText = scene.tradePopup.getChildByID('tradeRejectedText');
+            tradeRejectedText.innerText = tradeRequestText.innerText.replace('PLAYER_NAME', scene.otherPlayers[playerRejectingTrade].name);
+
+            utils.hideDOMElementsByIds(scene.tradePopup, ['tradeRequestText', 'yesButton', 'noButton']);
+
+            scene.tradePopup.getChildByID('okButton').addEventListener('click', function() {
+                scene.tradePopup.destroy();
+                if (fromDeck && index !== null && index > -1) {
+                    scene.openCards.splice(index, 0, new Card(scene).render(scene.width / 2 - 60 + (120 * index), scene.height / 2, gameObject.textureKey, 0, 0.5));
+                    scene.openCards[index].setInteractive();
+                    scene.input.setDraggable(scene.openCards[index]);
+                    console.log(scene.phase);
+                    if (scene.phase !== 1) {
+                        scene.phase = 1;
+                    }
+
+                    if (scene.openCards.length === 2) {
+                        // we need to disable trades
+                    }
+                    scene.socket.emit('updateOpenCards', scene.openCards);
+                } else if (fromHand && index !== null && index > -1) {
+                    let cardCoords = {x: scene.player.hand[index].x, y: scene.player.hand[index].y};
+                    scene.dealer.shiftHandDown(index, 1);
+                    scene.player.hand.splice(index, 0, new Card(scene).render(cardCoords.x, cardCoords.y, gameObject.textureKey, 0, 0.5));
+                    scene.player.hand[index].setInteractive();
+                    scene.input.setDraggable(scene.player.hand[index]);
+                }
+            });
         }
         
         this.dropOnField = function(gameObject, traded) {
@@ -57,7 +112,7 @@ export default class Turn {
                     if (scene.phase === 0) {
                         cardsPlayed++;
                         scene.player.hand.splice(0, 1);
-                        scene.dealer.shiftHand(0, 1);
+                        scene.dealer.shiftHandUp(0, 1);
             
                         let nextCard = scene.player.hand[0];
                         if (nextCard) {
@@ -157,8 +212,8 @@ export default class Turn {
             let availableField = utils.getAvailableField(scene.otherPlayers[player].fields, gameObject.texture.key);
             if (availableField) {
                 if (scene.phase === 1) {
-                    scene.socket.emit('tradeCard', gameObject, player);
-                    self.removeFromOpenCards(gameObject);
+                    let index = self.removeFromOpenCards(gameObject);
+                    scene.socket.emit('tradeCard', gameObject, scene.player.id, player, true, false, index);
                     if (scene.openCards.length === 0) {
                         scene.phase++;
                     }
@@ -180,10 +235,10 @@ export default class Turn {
             // check if it can be traded with that player
             let availableField = utils.getAvailableField(scene.otherPlayers[player].fields, gameObject.texture.key);
             if (availableField) {
-                scene.socket.emit('tradeCard', gameObject, player);
                 let index = scene.player.hand.indexOf(gameObject);
+                scene.socket.emit('tradeCard', gameObject, scene.player.id, player, false, true, index);
                 scene.player.hand.splice(index, 1);
-                scene.dealer.shiftHand(index, 1);
+                scene.dealer.shiftHandUp(index, 1);
                 gameObject.destroy();
             } else {
                 gameObject.x = gameObject.input.dragStartX;
@@ -192,6 +247,9 @@ export default class Turn {
         }
 
         scene.input.on('drop', function(pointer, gameObject, dropZone) {
+            console.log('trying to drop');
+            console.log('phase', scene.phase);
+            console.log('dropZone.name', dropZone.name);
             if (scene.phase < 2 && dropZone.name === scene.player.fieldZone.name) {
                 self.dropOnField(gameObject, false);
             } else if (scene.phase === 1 && dropZone.name === scene.discardPile.dropZone.name) {
