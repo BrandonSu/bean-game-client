@@ -150,9 +150,15 @@ export default class Dealer {
             scene.socket.emit('endTurn', scene.player.order);
         }
 
-        this.shiftHand = function(startingIndex, spots) {
+        this.shiftHandUp = function(startingIndex, spots) {
             for (let i = startingIndex; i < scene.player.hand.length; i++) {
                 scene.player.hand[i].x -= (120 * spots);
+            }
+        }
+
+        this.shiftHandDown = function(startingIndex, spots) {
+            for (let i = startingIndex; i < scene.player.hand.length; i++) {
+                scene.player.hand[i].x += (120 * spots);
             }
         }
     }
