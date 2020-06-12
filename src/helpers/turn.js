@@ -61,7 +61,7 @@ export default class Turn {
             scene.tradePopup = scene.add.dom(scene.width / 2, scene.height / 2).setOrigin(0.5).createFromCache('tradePopup');
 
             let tradeRejectedText = scene.tradePopup.getChildByID('tradeRejectedText');
-            tradeRejectedText.innerText = tradeRequestText.innerText.replace('PLAYER_NAME', scene.otherPlayers[playerRejectingTrade].name);
+            tradeRejectedText.innerText = tradeRejectedText.innerText.replace('PLAYER_NAME', scene.otherPlayers[playerRejectingTrade].name);
 
             utils.hideDOMElementsByIds(scene.tradePopup, ['tradeRequestText', 'yesButton', 'noButton']);
 

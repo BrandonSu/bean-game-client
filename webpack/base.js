@@ -1,6 +1,7 @@
 const webpack = require("webpack");
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const HandlebarsWebpackPlugin = require("handlebars-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
 module.exports = {
@@ -34,7 +35,15 @@ module.exports = {
       WEBGL_RENDERER: JSON.stringify(true)
     }),
     new HtmlWebpackPlugin({
-      template: "./index.html"
+      template: "./index.hbs"
+    }),
+    new HandlebarsWebpackPlugin({
+      htmlWebpackPlugin: {
+      enabled: true, // register all partials from html-webpack-plugin, defaults to `false`
+      prefix: "html" // where to look for htmlWebpackPlugin output. default is "html"
+      },
+      entry: "./index.hbs",
+      output: path.join(process.cwd(), "dist", "[name].html")
     })
   ]
 };
