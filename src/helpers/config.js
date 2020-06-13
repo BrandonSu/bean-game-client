@@ -10,7 +10,7 @@ const BEAN_HARVESTING_NUMBERS_MAP = {
     'blackEyedBean': {2: 1, 4: 2, 5: 3, 6: 4},
     'soyBean': {2: 1, 4: 2, 6: 3, 7: 4},
     'greenBean': {3: 1, 5: 2, 6: 3, 7: 4},
-    'stinkBean': {3: 1, 5: 2, 7: 3, 8: 3},
+    'stinkBean': {3: 1, 5: 2, 7: 3, 8: 4},
     'chiliBean': {3: 1, 6: 2, 8: 3, 9: 4},
     'blueBean': {4: 1, 6: 2, 8: 3, 10: 4},
     'waxBean': {4: 1, 7: 2, 9: 3, 11: 4},
