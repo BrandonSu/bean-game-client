@@ -106,3 +106,9 @@ input {
 .tradeButton {
 	width: 150px;
 }
+
+#deckTextContainer {
+	width: 80px;
+	text-align: center;
+	font-size: 18px;
+}

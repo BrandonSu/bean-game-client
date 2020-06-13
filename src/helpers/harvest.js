@@ -100,13 +100,13 @@ export default class Harvest {
          * @param {number} coins number of coins to be received after discarding field
          */
         this.updatePopupText = function(discardHarvestFlag, field, coins = 0, cardsDiscarded) {
-            let harvestText = scene.harvestPopup.getChildByID('harvestText');
-            let discardText = scene.harvestPopup.getChildByID('discardText');
             if (discardHarvestFlag === config.CONSTANTS.FLAGS.HARVEST_FLAG) {
-                discardText.style.display = 'none';
+                utils.hideDOMElementsByIds(scene.harvestPopup, ['discardText']);
+                let harvestText = scene.harvestPopup.getChildByID('harvestText');
                 harvestText.innerText = harvestText.innerText.replace('NUM_BEANS', cardsDiscarded).replace('BEAN_TYPE', utils.getBeanNameFromField(field)).replace('NUM_COINS', coins);
             } else if (discardHarvestFlag == config.CONSTANTS.FLAGS.DISCARD_FLAG) {
-                harvestText.style.display = 'none';
+                utils.hideDOMElementsByIds(scene.harvestPopup, ['harvestText']);
+                let discardText = scene.harvestPopup.getChildByID('discardText');
                 discardText.innerText = discardText.innerText.replace('NUM_BEANS', field.cardCount).replace('BEAN_TYPE', utils.getBeanNameFromField(field));
             }
             

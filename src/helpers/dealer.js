@@ -24,6 +24,8 @@ export default class Dealer {
             scene.startHere = scene.add.image(0, scene.height - 100, 'startHere').setOrigin(0, 0.5).setScale(0.5).disableInteractive();
 
             scene.deck = scene.add.image(scene.width / 2 - 200, scene.height / 2, 'deck').setOrigin(0, 0.5).setScale(0.25).disableInteractive();
+            scene.deckText = scene.add.dom(scene.width / 2 - 180, scene.height / 2).setOrigin(0, 0.5).createFromCache('deckText');
+            utils.hideDOMElementsByIds(scene.deckText, ['flipCardsText', 'takeThreeText'])
             
             // middle deck
             scene.add.image(scene.width / 2 - 60, scene.height / 2, 'drawnFirst').setOrigin(0, 0.5).setScale(0.25).setInteractive();

@@ -277,8 +277,11 @@ export default class Turn {
         }
 
         this.flipCards = function(deckToFlip) {
+            utils.showDOMElementsByIds(scene.deckText, ['flipCardsText']);
+            utils.hideDOMElementsByIds(scene.deckText, ['takeThreeText']);
             scene.deck.setInteractive();
             scene.deck.on('pointerdown', function() {
+                utils.hideDOMElementsByIds(scene.deckText, ['flipCardsText']);
                 if (scene.phase === 0) scene.phase++;
                 if (scene.player.hand.length) scene.player.hand[0].disableInteractive();
                 deck = deckToFlip;
@@ -306,8 +309,11 @@ export default class Turn {
         }
 
         this.takeThree = function(deck) {
+            utils.hideDOMElementsByIds(scene.deckText, ['flipCardsText']);
+            utils.showDOMElementsByIds(scene.deckText, ['takeThreeText']);
             scene.deck.setInteractive();
             scene.deck.on('pointerdown', function() {
+                utils.hideDOMElementsByIds(scene.deckText, ['takeThreeText']);
                 scene.socket.emit('disableTrades');
                 scene.dealer.takeThree(deck);
             });

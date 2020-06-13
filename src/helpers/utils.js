@@ -110,6 +110,29 @@ function hideDOMElementsByIds(parentNode, elementIdsArray) {
 }
 
 /**
+ * @method showDOMElements
+ * @description Shows DOM elements specified
+ * @param elementsArray {Array} DOM elements to show
+ */
+function showDOMElements(elementsArray) {
+    elementsArray.forEach( el => el.style.display = 'block');
+}
+
+/**
+ * @method showDOMElementsByIds
+ * @description Show DOM elements with specified IDs
+ * @param parentNode {DOMElement} parent element whose children we want to show
+ * @param elementIdsArray {Array} IDs of elements to show
+ */
+function showDOMElementsByIds(parentNode, elementIdsArray) {
+    let elementsArray = [];
+    elementIdsArray.forEach( id => {
+        elementsArray.push(parentNode.getChildByID(id));
+    });
+    showDOMElements(elementsArray);
+}
+
+/**
  * @function getBeanNameFromField
  * @description Helper function to return parsed bean name from field
  * @param {Object} field Field whose bean type we need to parse
@@ -142,6 +165,8 @@ export default {
     getPlacementVariables,
     hideDOMElements,
     hideDOMElementsByIds,
+    showDOMElements,
+    showDOMElementsByIds,
     getBeanNameFromField,
     getBeanNameFromBeanType
 };
