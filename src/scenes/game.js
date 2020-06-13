@@ -41,6 +41,7 @@ export default class Game extends Phaser.Scene {
         this.load.image('table', 'src/assets/images/table.jpg');
 
         this.load.html('nameform', 'src/assets/html/name-form.html');
+        this.load.html('deckText', 'src/assets/html/deck-text.html');
         this.load.html('dashboard', 'src/assets/html/dashboard.html');
         this.load.html('harvestPopup', 'src/assets/html/harvest-popup.html');
         this.load.html('tradePopup', 'src/assets/html/trade-popup.html');
@@ -86,7 +87,11 @@ export default class Game extends Phaser.Scene {
 
         // SOCKET STUFF
         // env vars don't get passed in from server.js
+<<<<<<< HEAD
         console.log(process.env.SERVER);
+=======
+        // process.env.SERVER = 'https://3f9bffdd3636.ngrok.io';
+>>>>>>> 1637045... added deck text for flip and end turn
         this.socket = io(process.env.SERVER || 'http://localhost:2000/');
         this.socket.on('connect', function() {
             console.log('Connected: ' + self.socket.id);
