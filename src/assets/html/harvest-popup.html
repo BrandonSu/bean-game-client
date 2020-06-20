@@ -1,6 +1,15 @@
-<div id="harvestPopupContainer">
-    <p id="harvestText">Harvest NUM_BEANS BEAN_TYPE for NUM_COINS coins?</p>
-    <p id="discardText">Discard NUM_BEANS BEAN_TYPE?</p>
-    <button id="yesButton" class="harvestButton" type="button">Yes</button>
-    <button id="noButton" class="harvestButton" type="button">No</button>
+<div id="harvestPopupContainer" class="popupContainer">
+    <div id="selectFieldWrapper">
+        <p id="selectField">Which field do you want to harvest or discard?</p>
+        <button id="leftFieldButton" class="selectFieldButton" type="button">Left field</button>
+        <button id="rightFieldButton" class="selectFieldButton" type="button">Right field</button>
+        <button id="cancelHarvestButton" class="selectFieldButton" type="button">Cancel</button>
+    </div>
+
+    <div id="confirmHarvestWrapper">
+        <p id="harvestText">Harvest NUM_BEANS BEAN_TYPE for NUM_COINS coins?</p>
+        <p id="discardText">Discard NUM_BEANS BEAN_TYPE?</p>
+        <button id="yesButton" class="harvestButton" type="button">Yes</button>
+        <button id="noButton" class="harvestButton" type="button">No</button>
+    </div>
 </div>

@@ -10,17 +10,6 @@ function toggleDisplay(element) {
 }
 
 /**
- * @method resetHarvestFieldButtonDisplay
- * @description Toggles the display of all harvest field buttons
- * @param scene {Phaser.Scene} 
- */
-function resetHarvestFieldButtonDisplay(scene) {
-    toggleDisplay(scene.dashboard.getChildByID('harvestFieldButton'));
-    toggleDisplay(scene.dashboard.getChildByID('leftFieldButton'));
-    toggleDisplay(scene.dashboard.getChildByID('rightFieldButton'));
-}
-
-/**
  * @method getPlayersExcept
  * @description Returns players object excluding specified player
  * @param playersObject {Object} all the players
@@ -48,6 +37,18 @@ function isFieldEmpty(field) {
 }
 
 /**
+ * @method checkPlayerTurnNext
+ * @description Checks if player's turn is up next
+ * @param player {Object}
+ * @param playerTurn {Object}
+ * @param allPlayers {Object}
+ * @returns {boolean} 
+ */
+function checkPlayerTurnNext(player, playerTurn, allPlayers) {
+    return player.order === (playerTurn.order + 1) || (player.order === 1 && playerTurn.order === (Object.keys(allPlayers).length + 1));
+}
+
+/**
  * @method getAvailableField
  * @description Checks if there is a field where cardPlanted can be planted
  * @param fields {Array} player's fields to check
@@ -56,7 +57,7 @@ function isFieldEmpty(field) {
  */
 function getAvailableField(fields, cardPlanted) {
     let emptyFields = fields.filter((field) => isFieldEmpty(field));
-    let matchingFields = fields.filter((field) => field.fieldType === cardPlanted);
+    let matchingFields = fields.filter((field) => field.fieldType === getAssetNameWithoutSize(cardPlanted));
     return matchingFields.concat(emptyFields)[0];
 }
 
@@ -69,14 +70,13 @@ function getAvailableField(fields, cardPlanted) {
 function getPlacementVariables(numOfPlayers) {
     let maxPlayers = numOfPlayers === 7;
     return {
-        scale: maxPlayers ? 0.15 : 0.20,
         cardOffset: {
             x: maxPlayers ? 50 : 25,
-            y: maxPlayers ? 50 : 30
+            y: maxPlayers ? 55 : 35
         },
         counterOffset: {
             x: maxPlayers ? 0 : 10,
-            y: maxPlayers ? 120 : 150 
+            y: maxPlayers ? 130 : 160
         },
         nameOffset: {
             x: 120,
@@ -136,6 +136,7 @@ function showDOMElementsByIds(parentNode, elementIdsArray) {
  * @function getBeanNameFromField
  * @description Helper function to return parsed bean name from field
  * @param {Object} field Field whose bean type we need to parse
+ * @returns {string} the name of the beans planted in field
  */
 function getBeanNameFromField(field) {
     let name = getBeanNameFromBeanType(field.fieldType);
@@ -147,9 +148,37 @@ function getBeanNameFromField(field) {
  * @function getBeanNameFromBeanType
  * @description Helper function to return parsed bean name by beanType
  * @param {string} beanType Bean type we want to parse
+ * @returns {string} parsed bean name
  */
 function getBeanNameFromBeanType(beanType) {
     return config.CONSTANTS.BEAN_NAME_MAP[beanType];
+}
+
+/**
+ * @function adjustAssetSize
+ * @description Helper function to change asset size
+ * @param {string} assetName Asset name including asset size appended at the end
+ * @param {string} desiredSize Desired asset size
+ * @returns {string} new asset name with replaced asset size
+ */
+function adjustAssetSize(assetName, desiredSize) {
+    return getAssetNameWithoutSize(assetName) + desiredSize;
+}
+
+/**
+ * @function getAssetNameWithoutSize
+ * @description Helper function to get asset name without size
+ * @param {string} assetName Asset name including asset size appended at the end
+ * @returns {string} asset name without asset size
+ */
+function getAssetNameWithoutSize(assetName) {
+    if (assetName.indexOf(config.CONSTANTS.ASSET_SIZE.LARGE) !== -1) {
+        return assetName.substring(0, assetName.indexOf(config.CONSTANTS.ASSET_SIZE.LARGE));
+    } else if (assetName.indexOf(config.CONSTANTS.ASSET_SIZE.SMALL) !== -1) {
+        return assetName.substring(0, assetName.indexOf(config.CONSTANTS.ASSET_SIZE.SMALL));
+    } else { // there is no asset size appended
+        return assetName;
+    }
 }
 
 /**
@@ -158,7 +187,6 @@ function getBeanNameFromBeanType(beanType) {
  */
 export default {
     toggleDisplay,
-    resetHarvestFieldButtonDisplay,
     getPlayersExcept,
     isFieldEmpty,
     getAvailableField,
@@ -168,5 +196,8 @@ export default {
     showDOMElements,
     showDOMElementsByIds,
     getBeanNameFromField,
-    getBeanNameFromBeanType
+    getBeanNameFromBeanType,
+    adjustAssetSize,
+    getAssetNameWithoutSize,
+    checkPlayerTurnNext
 };

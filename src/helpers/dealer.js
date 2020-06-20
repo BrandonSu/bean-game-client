@@ -11,55 +11,49 @@ export default class Dealer {
                 deck.splice(0, 1);
 
                 let playerCard = new Card(scene);
-                scene.player.hand.push(playerCard.render(50 + i * 120, scene.height - 100, beanName, 0, 0.5));
+                scene.player.hand.push(playerCard.render(50 + i * 120, scene.height - 100, utils.adjustAssetSize(beanName, config.CONSTANTS.ASSET_SIZE.LARGE), 0, 0.5));
             }
             scene.socket.emit('updateDeck', deck);
         }
 
         this.setup = function(deck, playerOrder) {
-            scene.playerCountText.destroy();
-            scene.startText.destroy();
+            if (scene.playerCountText) scene.playerCountText.destroy();
+            if (scene.startText) scene.startText.destroy();
 
             // add start here for player
             scene.startHere = scene.add.image(0, scene.height - 100, 'startHere').setOrigin(0, 0.5).setScale(0.5).disableInteractive();
 
-            scene.deck = scene.add.image(scene.width / 2 - 200, scene.height / 2, 'deck').setOrigin(0, 0.5).setScale(0.25).disableInteractive();
-            scene.deckText = scene.add.dom(scene.width / 2 - 180, scene.height / 2).setOrigin(0, 0.5).createFromCache('deckText');
-            utils.hideDOMElementsByIds(scene.deckText, ['flipCardsText', 'takeThreeText'])
-            
+            scene.deck = scene.add.image(scene.width / 2 - 200, scene.height / 2, 'deck').setOrigin(0, 0.5).disableInteractive();
+            scene.deckText = scene.add.dom(scene.width / 2 - 200, scene.height / 2 - 90).setOrigin(0, 0.5).createFromCache('deckText');
+            utils.hideDOMElementsByIds(scene.deckText, ['flipCardsText', 'takeThreeText']);
+            scene.fieldText = scene.add.dom(100, scene.height / 2 - 90).setOrigin(0, 0.5).createFromCache('fieldText');
+            utils.hideDOMElementsByIds(scene.fieldText, ['plantFirstText', 'plantAnotherText']);
+
             // middle deck
-            scene.add.image(scene.width / 2 - 60, scene.height / 2, 'drawnFirst').setOrigin(0, 0.5).setScale(0.25).setInteractive();
-            scene.add.image(scene.width / 2 + 60, scene.height / 2, 'drawnSecond').setOrigin(0, 0.5).setScale(0.25).setInteractive();
+            scene.add.image(scene.width / 2 - 60, scene.height / 2, 'drawnFirst').setOrigin(0, 0.5).setInteractive();
+            scene.add.image(scene.width / 2 + 60, scene.height / 2, 'drawnSecond').setOrigin(0, 0.5).setInteractive();
             scene.discardPile = {
-                image: scene.add.image(scene.width / 2 + 200, scene.height / 2, 'discardPile').setOrigin(0, 0.5).setScale(0.25),
+                image: scene.add.image(scene.width / 2 + 200, scene.height / 2, 'discardPile').setOrigin(0, 0.5),
                 dropZone: scene.zone.renderZone(scene.width / 2 + 260, scene.height / 2, 150, 215, 'discardZone'),
                 list: []
             };
 
             // player fields
-            scene.add.image(50, scene.height / 2, 'field').setOrigin(0, 0.5).setScale(0.25).setInteractive();
+            scene.add.image(50, scene.height / 2, utils.adjustAssetSize('field', config.CONSTANTS.ASSET_SIZE.LARGE)).setOrigin(0, 0.5).setInteractive();
             scene.player.fields[0].counterText = scene.add.text(108, scene.height / 2 + 105, [scene.player.fields[0].cardCount]).setOrigin(0.5).setFontSize(25).setFontFamily('Bodoni Highlight').setColor('#fad550');
-            scene.add.image(175, scene.height / 2, 'field').setOrigin(0, 0.5).setScale(0.25).setInteractive();
+            scene.add.image(175, scene.height / 2, utils.adjustAssetSize('field', config.CONSTANTS.ASSET_SIZE.LARGE)).setOrigin(0, 0.5).setInteractive();
             scene.player.fields[1].counterText = scene.add.text(233, scene.height / 2 + 105, [scene.player.fields[1].cardCount]).setOrigin(0.5).setFontSize(25).setFontFamily('Bodoni Highlight').setColor('#fad550');
 
             // player name + coins
             scene.add.text(scene.width - 130, 35, [scene.player.name]).setOrigin(0.5).setFontSize(25).setFontFamily('Bodoni Highlight').setColor('#fad550');
-            scene.add.image(scene.width - 158, 75, 'coin').setOrigin(0, 0).setScale(0.15);
+            scene.add.image(scene.width - 158, 75, 'coin').setOrigin(0, 0);
             scene.coinCount = scene.add.text(scene.width - 125, 150, [scene.player.coins]).setOrigin(0.5).setFontSize(25).setFontFamily('Bodoni Highlight').setColor('#fad550');
 
             scene.dashboard = scene.add.dom(scene.width - 150, scene.height / 2).setOrigin(0.5).createFromCache('dashboard');
             utils.toggleDisplay(scene.dashboard.getChildByID('endGameButton'));
 
             scene.dashboard.getChildByID('harvestFieldButton').addEventListener('click', function() {
-                utils.resetHarvestFieldButtonDisplay(scene);
-            });
-
-            scene.dashboard.getChildByID('leftFieldButton').addEventListener('click', function() {
-                scene.harvest.harvestField(config.CONSTANTS.FIELD_INDEX.LEFT_FIELD);
-            });
-
-            scene.dashboard.getChildByID('rightFieldButton').addEventListener('click', function() {
-                scene.harvest.harvestField(config.CONSTANTS.FIELD_INDEX.RIGHT_FIELD);
+                scene.harvest.createHarvestPopup();
             });
             
             scene.placementConfig = utils.getPlacementVariables(Object.keys(scene.otherPlayers).length);
@@ -69,10 +63,9 @@ export default class Dealer {
             // player is each playerId
             for (let player in scene.otherPlayers) {
                 if (player != scene.player.id) {
-                    scene.add.text(
-                        scene.placementConfig.nameOffset.x + scene.placementConfig.distanceBetweenFields * i, 
-                        scene.placementConfig.nameOffset.y, [scene.otherPlayers[player].name]
-                    ).setOrigin(0.5).setFontSize(18).setFontFamily('Bodoni Highlight').setColor('#fad550');
+                    scene.otherPlayers[player].nameElement = scene.add.dom(scene.placementConfig.nameOffset.x + scene.placementConfig.distanceBetweenFields * i, scene.placementConfig.nameOffset.y).createFromCache('playerName');
+                    scene.otherPlayers[player].nameElement.getChildByID('name').innerText = scene.otherPlayers[player].name;
+
                     scene.otherPlayers[player].coinStack = {
                         x: scene.placementConfig.nameOffset.x + scene.placementConfig.distanceBetweenFields * i - 45,
                         y: scene.placementConfig.nameOffset.y
@@ -80,13 +73,13 @@ export default class Dealer {
 
                     scene.otherPlayers[player].fields[0].placemat = scene.add.image(
                         scene.placementConfig.cardOffset.x + scene.placementConfig.distanceBetweenFields * i, 
-                        scene.placementConfig.cardOffset.y, 'field'
-                    ).setOrigin(0, 0).setScale(scene.placementConfig.scale).setInteractive();
+                        scene.placementConfig.cardOffset.y, utils.adjustAssetSize('field', config.CONSTANTS.ASSET_SIZE.SMALL)
+                    ).setOrigin(0, 0).setInteractive();
                     
                     scene.otherPlayers[player].fields[1].placemat = scene.add.image(
                         125 + scene.placementConfig.distanceBetweenFields * i, 
-                        scene.placementConfig.cardOffset.y, 'field'
-                    ).setOrigin(0, 0).setScale(scene.placementConfig.scale).setInteractive();
+                        scene.placementConfig.cardOffset.y, utils.adjustAssetSize('field', config.CONSTANTS.ASSET_SIZE.SMALL)
+                    ).setOrigin(0, 0).setInteractive();
 
                     scene.otherPlayers[player].fields[0].x = scene.placementConfig.cardOffset.x + scene.placementConfig.distanceBetweenFields * i;
                     scene.otherPlayers[player].fields[0].y = scene.placementConfig.cardOffset.y;
@@ -117,7 +110,7 @@ export default class Dealer {
             scene.openCards.forEach(function(card) { card.destroy(); });
             scene.openCards = [];
             deck.splice(0, 2).forEach(function(card, i) {
-                scene.openCards.push(new Card(scene).render(scene.width / 2 - 60 + (120 * i), scene.height / 2, card, 0, 0.5));
+                scene.openCards.push(new Card(scene).render(scene.width / 2 - 60 + (120 * i), scene.height / 2, utils.adjustAssetSize(card, config.CONSTANTS.ASSET_SIZE.LARGE), 0, 0.5));
             })
             scene.openCards.forEach(function(card) {
                 if (!card.scene) card.scene = scene;
@@ -140,7 +133,7 @@ export default class Dealer {
         this.takeThree = function(deck) {
             let numOfCardsHand = scene.player.hand.length;
             for (let i = 0; i < 3; i++) {
-                scene.player.hand.push(new Card(scene).render(50 + (numOfCardsHand + i) * 120, scene.height - 100, deck[i], 0, 0.5).disableInteractive());
+                scene.player.hand.push(new Card(scene).render(50 + (numOfCardsHand + i) * 120, scene.height - 100, utils.adjustAssetSize(deck[i], config.CONSTANTS.ASSET_SIZE.LARGE), 0, 0.5).disableInteractive());
             }
             deck.splice(0, 3);
             scene.deck.disableInteractive();

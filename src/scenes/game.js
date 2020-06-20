@@ -14,38 +14,47 @@ export default class Game extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('cocoaBean', 'src/assets/images/4-cocoa.png');
-        this.load.image('gardenBean', 'src/assets/images/6-garden.png');
-        this.load.image('redBean', 'src/assets/images/8-red.png');
-        this.load.image('blackEyedBean', 'src/assets/images/10-black-eyed.png');
-        this.load.image('soyBean', 'src/assets/images/12-soy.png');
-        this.load.image('greenBean', 'src/assets/images/14-green.png');
-        this.load.image('stinkBean', 'src/assets/images/16-stink.png');
-        this.load.image('chiliBean', 'src/assets/images/18-chili.png');
-        this.load.image('blueBean', 'src/assets/images/20-blue.png');
-        this.load.image('waxBean', 'src/assets/images/22-wax.png');
-        this.load.image('coffeeBean', 'src/assets/images/24-coffee.png');
+        this.load.image('cocoaBeanSmall', 'src/assets/images/4-cocoa_small.png');
+        this.load.image('gardenBeanSmall', 'src/assets/images/6-garden_small.png');
+        this.load.image('redBeanSmall', 'src/assets/images/8-red_small.png');
+        this.load.image('blackEyedBeanSmall', 'src/assets/images/10-black-eyed_small.png');
+        this.load.image('soyBeanSmall', 'src/assets/images/12-soy_small.png');
+        this.load.image('greenBeanSmall', 'src/assets/images/14-green_small.png');
+        this.load.image('stinkBeanSmall', 'src/assets/images/16-stink_small.png');
+        this.load.image('chiliBeanSmall', 'src/assets/images/18-chili_small.png');
+        this.load.image('blueBeanSmall', 'src/assets/images/20-blue_small.png');
+        this.load.image('waxBeanSmall', 'src/assets/images/22-wax_small.png');
+        this.load.image('coffeeBeanSmall', 'src/assets/images/24-coffee_small.png');
 
-        this.load.image('field', 'src/assets/images/field.png');
+        this.load.image('cocoaBeanLarge', 'src/assets/images/4-cocoa_large.png');
+        this.load.image('gardenBeanLarge', 'src/assets/images/6-garden_large.png');
+        this.load.image('redBeanLarge', 'src/assets/images/8-red_large.png');
+        this.load.image('blackEyedBeanLarge', 'src/assets/images/10-black-eyed_large.png');
+        this.load.image('soyBeanLarge', 'src/assets/images/12-soy_large.png');
+        this.load.image('greenBeanLarge', 'src/assets/images/14-green_large.png');
+        this.load.image('stinkBeanLarge', 'src/assets/images/16-stink_large.png');
+        this.load.image('chiliBeanLarge', 'src/assets/images/18-chili_large.png');
+        this.load.image('blueBeanLarge', 'src/assets/images/20-blue_large.png');
+        this.load.image('waxBeanLarge', 'src/assets/images/22-wax_large.png');
+        this.load.image('coffeeBeanLarge', 'src/assets/images/24-coffee_large.png');
+
+        this.load.image('fieldLarge', 'src/assets/images/field_large.png');
+        this.load.image('fieldSmall', 'src/assets/images/field_small.png');
         this.load.image('coin', 'src/assets/images/coin.png');
-        this.load.image('coinStack1', 'src/assets/images/coin-stack-1.png');
-        this.load.image('coinStack2', 'src/assets/images/coin-stack-2.png');
-        this.load.image('coinStack3', 'src/assets/images/coin-stack-3.png');
-        this.load.image('coinStack4', 'src/assets/images/coin-stack-4.png');
-        this.load.image('cardBack', 'src/assets/images/card-back.png');
-        this.load.image('drawnFirst', 'src/assets/images/1st-drawn.png');
-        this.load.image('drawnSecond', 'src/assets/images/2nd-drawn.png');
-        this.load.image('discardPile', 'src/assets/images/discard-pile.png');
+        this.load.image('drawnFirst', 'src/assets/images/1st-drawn_large.png');
+        this.load.image('drawnSecond', 'src/assets/images/2nd-drawn_large.png');
+        this.load.image('discardPile', 'src/assets/images/discard-pile_large.png');
         this.load.image('startHere', 'src/assets/images/start-here.png');
-        this.load.image('deck', 'src/assets/images/deck.png');
+        this.load.image('deck', 'src/assets/images/deck_large.png');
         this.load.image('table', 'src/assets/images/table.jpg');
 
         this.load.html('nameform', 'src/assets/html/name-form.html');
         this.load.html('deckText', 'src/assets/html/deck-text.html');
+        this.load.html('fieldText', 'src/assets/html/field-text.html');
         this.load.html('dashboard', 'src/assets/html/dashboard.html');
         this.load.html('harvestPopup', 'src/assets/html/harvest-popup.html');
         this.load.html('tradePopup', 'src/assets/html/trade-popup.html');
-
+        this.load.html('playerName', 'src/assets/html/player-name.html');
     }
 
     create() {
@@ -88,10 +97,14 @@ export default class Game extends Phaser.Scene {
         // SOCKET STUFF
         // env vars don't get passed in from server.js
 <<<<<<< HEAD
+<<<<<<< HEAD
         console.log(process.env.SERVER);
 =======
         // process.env.SERVER = 'https://3f9bffdd3636.ngrok.io';
 >>>>>>> 1637045... added deck text for flip and end turn
+=======
+        // process.env.SERVER = 'https://488cb1a107bc.ngrok.io';
+>>>>>>> 76a2aff... hella enhancements
         this.socket = io(process.env.SERVER || 'http://localhost:2000/');
         this.socket.on('connect', function() {
             console.log('Connected: ' + self.socket.id);
@@ -105,7 +118,9 @@ export default class Game extends Phaser.Scene {
             if (name.length > 0) {
                 self.player.name = name;
                 self.playerCountText.setVisible(true);
-                self.startText.setVisible(true);
+                // if (self.numberOfPlayers === 1) {
+                    self.startText.setVisible(true);
+                // }
                 nameForm.destroy();
                 self.socket.emit('newPlayerName', self.socket.id, self.player);
             } else {
@@ -166,30 +181,28 @@ export default class Game extends Phaser.Scene {
         });
 
         this.socket.on('updatePlayerTurn', function(playerId) {
-            let dashboardHeader = document.querySelector('#dashboard h1');
             self.phase = 0;
+            Object.keys(self.otherPlayers).forEach(id => self.otherPlayers[id].nameElement.getChildByID('name').style.color = '#ffffff');
             if (self.otherPlayers[playerId]) {
                 self.playerTurn = self.otherPlayers[playerId];
-                dashboardHeader.innerHTML = self.playerTurn.name + '\'s turn';
-                dashboardHeader.style.color = '#ffffff';
+                self.otherPlayers[playerId].nameElement.getChildByID('name').style.color = '#fad550';
+                utils.hideDOMElementsByIds(self.dashboard, ['yourTurn']);
+                if (utils.checkPlayerTurnNext(self.player, self.playerTurn, self.otherPlayers)) {
+                    utils.showDOMElementsByIds(self.dashboard, ['yourTurnNext']);
+                }
             } else {
                 self.playerTurn = self.player;
-                dashboardHeader.innerHTML = 'YOUR TURN';
-                dashboardHeader.style.color = '#fad550';
+                utils.showDOMElementsByIds(self.dashboard, ['yourTurn']);
+                utils.hideDOMElementsByIds(self.dashboard, ['yourTurnNext']);
             }
         });
 
-        this.socket.on('updateCoinStack', function(playerId, asset) {
-            let player = self.otherPlayers[playerId];
-            if (player.coinStack.image) {
-                player.coinStack.image.destroy();
-            }
-            
-            player.coinStack.image = self.add.image(player.coinStack.x, player.coinStack.y, asset).setOrigin(1, 0.5).setScale(0.05);
+        this.socket.on('updateCoinStack', function(playerId, assetSrc) {
+            self.otherPlayers[playerId].nameElement.getChildByID('coinstack').src = assetSrc;
         });
 
         this.socket.on('cardPlayed', function(gameObject, player) {
-            let cardPlayed = gameObject.textureKey;
+            let cardPlayed = utils.getAssetNameWithoutSize(gameObject.textureKey);
             if (player.id !== self.player.id) {
                 let field = utils.getAvailableField(self.otherPlayers[player.id].fields, cardPlayed);
                 if (field) {
@@ -197,7 +210,7 @@ export default class Game extends Phaser.Scene {
                     field.counterText.setText(field.cardCount);
                     if (utils.isFieldEmpty(field)) {
                         field.fieldType = cardPlayed;
-                        field.cards.push(self.add.image(field.x, field.y, cardPlayed).setOrigin(0, 0).setScale(self.placementConfig.scale));
+                        field.cards.push(self.add.image(field.x, field.y, utils.adjustAssetSize(cardPlayed, config.CONSTANTS.ASSET_SIZE.SMALL)).setOrigin(0, 0));
                     }
                 }
             }
@@ -208,7 +221,7 @@ export default class Game extends Phaser.Scene {
             // adding to discardPile list so we can destroy images when we shuffle
             if (player.id !== self.player.id) {
                 if (addToDiscardPile) {
-                    self.discardPile.list.push(self.add.image(self.width / 2 + 200, self.height / 2, cardDiscarded).setOrigin(0, 0.5).setScale(0.25));
+                    self.discardPile.list.push(self.add.image(self.width / 2 + 200, self.height / 2, utils.adjustAssetSize(cardDiscarded, config.CONSTANTS.ASSET_SIZE.LARGE)).setOrigin(0, 0.5));
                 }
                 
                 if (entryPoint === config.CONSTANTS.ENTRY_POINTS.FIELD) {
@@ -238,12 +251,10 @@ export default class Game extends Phaser.Scene {
         });
 
         this.socket.on('requestTrade', function(gameObject, fromPlayer, fromDeck, fromHand, index) {
-            console.log('requestTrade');
             self.turn.requestTrade(gameObject, fromPlayer, fromDeck, fromHand, index);
         });
 
         this.socket.on('tradeRejected', function(playerRejectingTrade, gameObject, fromDeck, fromHand, index) {
-            console.log('tradeRejected');
             self.turn.handleRejectedTrade(playerRejectingTrade, gameObject, fromDeck, fromHand, index)
         });
 
@@ -289,13 +300,13 @@ export default class Game extends Phaser.Scene {
         });
 
         this.socket.on('gameEndedForPlayer', function(playerId, score) {
-            console.log(self.otherPlayers[playerId]);
             self.otherPlayers[playerId].fields.forEach(field => {
                 field.placemat.destroy();
                 field.counterText.destroy();
                 field.cards.forEach(card => card.destroy());
             });
-            self.add.image(self.otherPlayers[playerId].fields[0].x + 70, 70, 'coin').setOrigin(0.5, 0).setScale(0.15);
+            self.otherPlayers[playerId].nameElement.getChildByID('coinstack').src = '';
+            self.add.image(self.otherPlayers[playerId].fields[0].x + 70, 70, 'coin').setOrigin(0.5, 0);
             self.add.text(self.otherPlayers[playerId].fields[0].x + 70, 150, [score]).setOrigin(0.5).setFontSize(18).setFontFamily('Bodoni Highlight').setColor('#fad550');
         });
     }

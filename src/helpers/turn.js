@@ -68,10 +68,9 @@ export default class Turn {
             scene.tradePopup.getChildByID('okButton').addEventListener('click', function() {
                 scene.tradePopup.destroy();
                 if (fromDeck && index !== null && index > -1) {
-                    scene.openCards.splice(index, 0, new Card(scene).render(scene.width / 2 - 60 + (120 * index), scene.height / 2, gameObject.textureKey, 0, 0.5));
+                    scene.openCards.splice(index, 0, new Card(scene).render(scene.width / 2 - 60 + (120 * index), scene.height / 2, utils.adjustAssetSize(gameObject.textureKey, config.CONSTANTS.ASSET_SIZE.LARGE), 0, 0.5));
                     scene.openCards[index].setInteractive();
                     scene.input.setDraggable(scene.openCards[index]);
-                    console.log(scene.phase);
                     if (scene.phase !== 1) {
                         scene.phase = 1;
                     }
@@ -83,7 +82,7 @@ export default class Turn {
                 } else if (fromHand && index !== null && index > -1) {
                     let cardCoords = {x: scene.player.hand[index].x, y: scene.player.hand[index].y};
                     scene.dealer.shiftHandDown(index, 1);
-                    scene.player.hand.splice(index, 0, new Card(scene).render(cardCoords.x, cardCoords.y, gameObject.textureKey, 0, 0.5));
+                    scene.player.hand.splice(index, 0, new Card(scene).render(cardCoords.x, cardCoords.y, utils.adjustAssetSize(gameObject.textureKey, config.CONSTANTS.ASSET_SIZE.LARGE), 0, 0.5));
                     scene.player.hand[index].setInteractive();
                     scene.input.setDraggable(scene.player.hand[index]);
                 }
@@ -92,7 +91,7 @@ export default class Turn {
         
         this.dropOnField = function(gameObject, traded) {
             let fieldTypes = scene.player.fields.map( field => field.fieldType );
-            let cardPlanted = traded ? gameObject.textureKey : gameObject.texture.key;
+            let cardPlanted = utils.getAssetNameWithoutSize(traded ? gameObject.textureKey : gameObject.texture.key);
 
             let fieldToBePlanted = utils.getAvailableField(scene.player.fields, cardPlanted);
 
@@ -103,7 +102,7 @@ export default class Turn {
                     fieldToBePlanted.fieldType = cardPlanted;
                 }
                 if (traded) {
-                    fieldToBePlanted.cards.push(scene.add.image(fieldToBePlanted.x, fieldToBePlanted.y, cardPlanted).setOrigin(0, 0.5).setScale(0.25));
+                    fieldToBePlanted.cards.push(scene.add.image(fieldToBePlanted.x, fieldToBePlanted.y, utils.adjustAssetSize(cardPlanted, config.CONSTANTS.ASSET_SIZE.LARGE)).setOrigin(0, 0.5));
                 } else if (scene.phase < 2) {
                     fieldToBePlanted.cards.push(gameObject);
                     gameObject.x = fieldToBePlanted.x;
@@ -111,13 +110,15 @@ export default class Turn {
                     gameObject.disableInteractive();
                     if (scene.phase === 0) {
                         cardsPlayed++;
+                        utils.toggleDisplay(scene.fieldText.getChildByID('plantAnotherText'));
+                        utils.hideDOMElements([scene.fieldText.getChildByID('plantFirstText')]);
                         scene.player.hand.splice(0, 1);
                         scene.dealer.shiftHandUp(0, 1);
             
                         let nextCard = scene.player.hand[0];
                         if (nextCard) {
                             // smarter check, fieldTypes is an array of length 2
-                            let plantNext = fieldTypes.findIndex( fieldType => (fieldType === nextCard.texture.key || fieldType === config.CONSTANTS.EMPTY_FIELD)) != -1
+                            let plantNext = fieldTypes.findIndex( fieldType => (fieldType === utils.getAssetNameWithoutSize(nextCard.texture.key) || fieldType === config.CONSTANTS.EMPTY_FIELD)) != -1
                             if (plantNext && cardsPlayed < 2) {
                                 nextCard.setInteractive();
                                 scene.input.setDraggable(nextCard);
@@ -173,7 +174,7 @@ export default class Turn {
 
         this.discardCard = function(gameObject, entryPoint = null, addToDiscardPile = true, fieldIndex = null, emptyField = false) {
             gameObject.disableInteractive();
-            let cardDiscarded = gameObject.texture.key;
+            let cardDiscarded = utils.getAssetNameWithoutSize(gameObject.texture.key);
             if (addToDiscardPile) {
                 gameObject.x = scene.discardPile.image.x;
                 gameObject.y = scene.discardPile.image.y;
@@ -233,7 +234,7 @@ export default class Turn {
 
         this.dropToTradeFromHand = function(gameObject, player) {
             // check if it can be traded with that player
-            let availableField = utils.getAvailableField(scene.otherPlayers[player].fields, gameObject.texture.key);
+            let availableField = utils.getAvailableField(scene.otherPlayers[player].fields, utils.getAssetNameWithoutSize(gameObject.texture.key));
             if (availableField) {
                 let index = scene.player.hand.indexOf(gameObject);
                 scene.socket.emit('tradeCard', gameObject, scene.player.id, player, false, true, index);
@@ -247,9 +248,6 @@ export default class Turn {
         }
 
         scene.input.on('drop', function(pointer, gameObject, dropZone) {
-            console.log('trying to drop');
-            console.log('phase', scene.phase);
-            console.log('dropZone.name', dropZone.name);
             if (scene.phase < 2 && dropZone.name === scene.player.fieldZone.name) {
                 self.dropOnField(gameObject, false);
             } else if (scene.phase === 1 && dropZone.name === scene.discardPile.dropZone.name) {
@@ -265,6 +263,8 @@ export default class Turn {
         });
 
         this.plant = function() {
+            utils.showDOMElementsByIds(scene.fieldText, ['plantFirstText']);
+            utils.hideDOMElementsByIds(scene.fieldText, ['plantAnotherText']);
             cardsPlayed = 0;
             let firstCard = scene.player.hand[0];
             if (firstCard) {
@@ -282,6 +282,7 @@ export default class Turn {
             scene.deck.setInteractive();
             scene.deck.on('pointerdown', function() {
                 utils.hideDOMElementsByIds(scene.deckText, ['flipCardsText']);
+                utils.hideDOMElementsByIds(scene.fieldText,['plantAnotherText']);
                 if (scene.phase === 0) scene.phase++;
                 if (scene.player.hand.length) scene.player.hand[0].disableInteractive();
                 deck = deckToFlip;

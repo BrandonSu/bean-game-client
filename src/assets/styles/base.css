@@ -59,7 +59,8 @@ input {
 
 #dashboard button,
 .harvestButton,
-.tradeButton {
+.tradeButton,
+.selectFieldButton {
 	background: rgba(250, 213, 80, 0.8);
 	border: 2px solid #fad550;
 	border-radius: 20px;
@@ -78,18 +79,33 @@ input {
 	background: #fad550;
 }
 
+#yourTurn {
+	color: #fad550;
+	display: none;
+}
+
+#yourTurnNext {
+	color: white;
+	display: none;
+}
+
 .turnWrapper,
 .endGameWrapper {
 	width: 100%;
 	list-style: none;
 }
 
-/* HARVEST POPUP */
-#harvestPopupContainer,
-#tradePopupContainer {
+.popupContainer {
 	background: rgba(255, 255, 255, 0.95);
-	width: 350px;
 	padding: 20px 0;
+}
+
+#tradePopupContainer {
+	width: 350px;
+}
+
+#harvestPopupContainer {
+	width: 450px;
 }
 
 #harvestPopupContainer p,
@@ -103,12 +119,30 @@ input {
 	width: 100px;
 }
 
+.selectFieldButton {
+	width: 115px;
+}
+
 .tradeButton {
 	width: 150px;
 }
 
-#deckTextContainer {
-	width: 80px;
-	text-align: center;
+#deckTextContainer, #fieldTextContainer {
+	/* width: 80px; */
+	font-weight: 300;
+    opacity: 0.9;
+	color: white;
+}
+
+.playerNameContainer {
+	width: 200px;
+	color: white;
+	display: flex;
 	font-size: 18px;
+	justify-content: center;
+	align-items: center;
+}
+
+.playerNameContainer #coinstack {
+	margin: 0 10px 0 -10px;
 }

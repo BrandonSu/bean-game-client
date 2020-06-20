@@ -79,7 +79,7 @@ const FIELD_INDEX = {
  * @constant ALERT_MESSAGES
  * @memberof config
  * @description Constant to store alert messages.
- * @type {{RESHUFFLE_WARNING: string}, {RESHUFFLE_SUCCESS: Number}, {GAME_ENDING_WARNING: string}, {GAME_ENDED: string}}
+ * @type {{RESHUFFLE_WARNING: string}, {RESHUFFLE_SUCCESS: string}, {GAME_ENDING_WARNING: string}, {GAME_ENDED: string}}
  * @property {string} RESHUFFLE_WARNING Alert message for deck running low
  * @property {string} RESHUFFLE_SUCCESS Alert message for successful reshuffling
  * @property {string} GAME_ENDING_WARNING Alert message for game ending warning
@@ -99,6 +99,19 @@ const ALERT_MESSAGES = {
  * @type {string}
  */
 const EMPTY_FIELD = 'empty'
+
+/**
+ * @constant ASSET_SIZE
+ * @memberof config
+ * @description Constant to store size for assets.
+ * @type {{LARGE: string}, {SMALL: string}}
+ * @property {string} LARGE Size for large assets
+ * @property {string} SMALL Size for small assets
+*/
+const ASSET_SIZE = {
+    LARGE: 'Large',
+    SMALL: 'Small'
+}
 
 /**
  * @constant CONSTANTS
@@ -128,7 +141,8 @@ const CONSTANTS = {
     ENTRY_POINTS,
     FIELD_INDEX,
     ALERT_MESSAGES,
-    EMPTY_FIELD
+    EMPTY_FIELD,
+    ASSET_SIZE
 };
    
 /**

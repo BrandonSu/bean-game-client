@@ -10,7 +10,8 @@ export default class Harvest {
             // figure out if we are harvesting or discarding and update dom text
             let harvestNumbers = config.CONSTANTS.BEAN_HARVESTING_NUMBERS_MAP[field.fieldType];
             if (harvestNumbers) {
-                self.createDOMElements();
+                self.setupSelectFieldPopup();
+                
                 if (harvestNumbers[field.cardCount]) {
                     self.updatePopupText(config.CONSTANTS.FLAGS.HARVEST_FLAG, field, harvestNumbers[field.cardCount], field.cardCount);
                     self.setYesButtonEventListener(() => self.discardCardsFromField(field, field.cardCount, harvestNumbers[field.cardCount], fieldIndex, true));
@@ -32,24 +33,46 @@ export default class Harvest {
                 }
             } else {
                 window.alert('Field is empty.');
-                utils.resetHarvestFieldButtonDisplay(scene);
+                if (scene.harvestPopup) scene.harvestPopup.destroy();
             }
-
-            console.log('phase', scene.phase);
         }
 
         /**
-         * @function createDOMElements
-         * @description Creates DOM element for harvest popup and adds standard event listener for closing it.
+         * @function createHarvestPopup
+         * @description Creates DOM element for harvest popup and adds event listeners to buttons.
          * @memberof harvest
          */
-        this.createDOMElements = function() {
+        this.createHarvestPopup = function() {
             if (scene.harvestPopup) scene.harvestPopup.destroy();
             scene.harvestPopup = scene.add.dom(scene.width / 2, scene.height / 2).setOrigin(0.5).createFromCache('harvestPopup');
+
+            utils.hideDOMElementsByIds(scene.harvestPopup, ['confirmHarvestWrapper']);
+
+            scene.harvestPopup.getChildByID('cancelHarvestButton').addEventListener('click', function() {
+                scene.harvestPopup.destroy();
+            });
+
+            scene.harvestPopup.getChildByID('leftFieldButton').addEventListener('click', function() {
+                scene.harvest.harvestField(config.CONSTANTS.FIELD_INDEX.LEFT_FIELD);
+            });
+
+            scene.harvestPopup.getChildByID('rightFieldButton').addEventListener('click', function() {
+                scene.harvest.harvestField(config.CONSTANTS.FIELD_INDEX.RIGHT_FIELD);
+            });
+        }
+
+        /**
+         * @function setupSelectFieldPopup
+         * @description Updates 'click' event listener for button in harvest popup.
+         * @memberof harvest
+         */
+        this.setupSelectFieldPopup = function() {
+            utils.showDOMElementsByIds(scene.harvestPopup, ['confirmHarvestWrapper']);
+            utils.hideDOMElementsByIds(scene.harvestPopup, ['selectFieldWrapper']);
+
             scene.harvestPopup.getChildByID('noButton').addEventListener('click', function() {
                 scene.harvestPopup.destroy();
-                utils.resetHarvestFieldButtonDisplay(scene);
-            });            
+            });
         }
 
         /**
@@ -62,7 +85,6 @@ export default class Harvest {
             scene.harvestPopup.getChildByID('yesButton').addEventListener('click', function() {
                 callback();
                 scene.harvestPopup.destroy();
-                utils.resetHarvestFieldButtonDisplay(scene);
             });
         }
 
