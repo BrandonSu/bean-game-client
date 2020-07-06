@@ -139,7 +139,7 @@ export default class Game extends Phaser.Scene {
     // SOCKET STUFF
     // env vars don't get passed in from server.js
 
-    process.env.SERVER = "http://8d84bfcd469a.ngrok.io";
+    process.env.SERVER = "http://2c92cf662590.ngrok.io";
 
     this.socket = io(process.env.SERVER || "http://localhost:2000/");
     this.socket.on("connect", function () {
